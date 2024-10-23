@@ -2,7 +2,7 @@
 
 # Check if resourceGroup parameter is provided
 if [ -z "$1" ]; then
-  echo "Usage: $0 <resourceGroup>"
+  echo "Error: Please provide the resource group name as a parameter"
   exit 1
 fi
 resourceGroup=$1
