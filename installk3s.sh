@@ -1,4 +1,11 @@
 #!/bin/bash
+
+# Check if resourceGroup parameter is provided
+if [ -z "$1" ]; then
+  echo "Usage: $0 <resourceGroup>"
+  exit 1
+fi
+
 sudo apt-get update
 
 # Set k3 deployment variables
@@ -50,7 +57,7 @@ az login --identity
 
 # Get the VM name from the Azure Instance Metadata Service
 vm_name=$(curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/name?api-version=2021-02-01&format=text")
-vm_resource_group=$(az vm show --query resourceGroup --name "$vm_name" --output tsv)
+vm_resource_group=$(az vm list --subscription "$subscription_id" --query "[?name=='$vm_name'].resourceGroup" --output tsv)
 clusterName="Arc-K3s"
 # Arc enable cluster using managed identity
 az connectedk8s connect --name $clusterName --resource-group $vm_resource_group --enable-oidc-issuer --enable-workload-identity
