@@ -5,6 +5,7 @@ if [ -z "$1" ]; then
   echo "Usage: $0 <resourceGroup>"
   exit 1
 fi
+resourceGroup=$1
 
 sudo apt-get update
 
@@ -57,12 +58,11 @@ az login --identity
 
 # Get the VM name from the Azure Instance Metadata Service
 vm_name=$(curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/name?api-version=2021-02-01&format=text")
-vm_resource_group=$(az vm list --subscription "$subscription_id" --query "[?name=='$vm_name'].resourceGroup" --output tsv)
 clusterName="Arc-K3s"
 # Arc enable cluster using managed identity
-az connectedk8s connect --name $clusterName --resource-group $vm_resource_group --enable-oidc-issuer --enable-workload-identity
+az connectedk8s connect --name $clusterName --resource-group $resourceGroup --enable-oidc-issuer --enable-workload-identity
 
-oidcIssuerUri=$(az connectedk8s show --resource-group $vm_resource_group --name $clusterName --query oidcIssuerProfile.issuerUrl --output tsv)
+oidcIssuerUri=$(az connectedk8s show --resource-group $resourceGroup --name $clusterName --query oidcIssuerProfile.issuerUrl --output tsv)
 configFile="/etc/rancher/k3s/config.yaml"
 cat <<EOF > $configFile
 kube-apiserver-arg:
@@ -72,6 +72,6 @@ EOF
 
 # Enabling custom locations
 objectId=$(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id -o tsv)
-az connectedk8s enable-features -n $clusterName -g $vm_resource_group --custom-locations-oid $objectId --features cluster-connect custom-locations
+az connectedk8s enable-features -n $clusterName -g $resourceGroup --custom-locations-oid $objectId --features cluster-connect custom-locations
 
 exit 0
