@@ -45,4 +45,8 @@ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
 
 sudo sysctl -p
 
+echo fs.file-max = 100000 | sudo tee -a /etc/sysctl.conf
+
+sudo sysctl -p
+
 exit 0
