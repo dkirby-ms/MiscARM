@@ -15,7 +15,6 @@ echo "Installing Rancher K3s cluster"
 echo ""
 publicIp=$(hostname -i)
 sudo mkdir ~/.kube
-sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik --disable servicelb --node-ip ${publicIp} --node-external-ip ${publicIp} --bind-address ${publicIp} --tls-san ${publicIp}" INSTALL_K3S_VERSION=v${K3S_VERSION} K3S_KUBECONFIG_MODE="644" sh -
 if [[ $? -ne 0 ]]; then
     echo "ERROR: K3s installation failed"
