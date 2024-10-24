@@ -48,8 +48,7 @@ echo ""
 echo "Making sure Rancher K3s cluster is ready..."
 echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
-sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
-
+sudo kubectl get nodes -o wide 
 
 # Prep cluster for AIO
 echo fs.inotify.max_user_instances=8192 | sudo tee -a /etc/sysctl.conf
@@ -73,7 +72,7 @@ retry_count=0
 success=false
 
 while [ $retry_count -lt $max_retries ]; do
-    az connectedk8s connect --name $clusterName --resource-group $resourceGroup --kube-config $KUBECONFIG --enable-oidc-issuer --enable-workload-identity
+    az connectedk8s connect --name $clusterName --resource-group $resourceGroup --kube-config $HOME/.kube/config --enable-oidc-issuer --enable-workload-identity
     if [ $? -eq 0 ]; then
         success=true
         break
