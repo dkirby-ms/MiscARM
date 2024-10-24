@@ -13,6 +13,22 @@ sudo apt-get update
 export K3S_VERSION="1.29.6+k3s2" # Do not change!
 
 # Installing Azure CLI & Azure Arc extensions
+while [ $retry_count -lt $max_retries ]; do
+    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    if [ $? -eq 0 ]; then
+        success=true
+        break
+    else
+        echo "Failed to install Azure CLI. Retrying (Attempt $((retry_count+1)))..."
+        retry_count=$((retry_count+1))
+        sleep 10
+    fi
+done
+
+if [ "$success" = false ]; then
+    echo "Error: Failed to install Azure CLI after $max_retries attempts."
+    exit 1
+fi
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 az -v
