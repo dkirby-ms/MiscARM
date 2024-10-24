@@ -28,6 +28,12 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
+# Renaming default context to k3s cluster name
+context=edge-k3s
+sudo kubectl config rename-context default $context --kubeconfig /etc/rancher/k3s/k3s.yaml
+sudo mkdir ~/.kube
+sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+
 # Installing Helm 3
 echo ""
 echo "Installing Helm"
