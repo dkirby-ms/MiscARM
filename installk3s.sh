@@ -2,10 +2,11 @@
 
 # Check if resourceGroup parameter is provided
 if [ -z "$1" ]; then
-  echo "Error: Please provide the resource group name as a parameter"
+  echo "Error: Please provide the resource group name and custom location object id as parameters."
   exit 1
 fi
 resourceGroup=$1
+objectId=$2
 
 sudo apt-get update
 
@@ -113,16 +114,14 @@ kube-apiserver-arg:
 EOF
 
 # Enabling custom locations
-objectId=$(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id -o tsv)
 az connectedk8s enable-features -n $clusterName -g $resourceGroup --custom-locations-oid $objectId --features cluster-connect custom-locations
 
 systemctl restart k3s
 
-# Prep key vault
+# Prep AIO deploy
 randomstr=$(head /dev/urandom | tr -dc a-z0-9 | head -c 8)
 $vault=kv-${randomstr}
 az keyvault create --enable-rbac-authorization --name $kv --resource-group $resourceGroup
-
 
 sa=ig24prel18${randomstr}
 az storage account create --name $sa --resource-group $resourceGroup --enable-hierarchical-namespace
