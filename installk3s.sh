@@ -118,4 +118,17 @@ az connectedk8s enable-features -n $clusterName -g $resourceGroup --custom-locat
 
 systemctl restart k3s
 
+# Prep key vault
+randomstr=$(head /dev/urandom | tr -dc a-z0-9 | head -c 8)
+$vault=kv-${randomstr}
+az keyvault create --enable-rbac-authorization --name $kv --resource-group $resourceGroup
+
+
+sa=ig24prel18${randomstr}
+az storage account create --name $sa --resource-group $resourceGroup --enable-hierarchical-namespace
+
+$schemaName=schema${randomstr}
+$namespace="Ignite"
+az iot ops schema registry create --name $schemaName --resource-group $resourceGroup --registry-namespace $namespace --sa-resource-id $(az storage account show --name $sa --resource-group $resourceGroup -o tsv --query id)
+
 exit 0
