@@ -100,4 +100,6 @@ EOF
 objectId=$(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id -o tsv)
 az connectedk8s enable-features -n $clusterName -g $resourceGroup --custom-locations-oid $objectId --features cluster-connect custom-locations
 
+systemctl restart k3s
+
 exit 0
