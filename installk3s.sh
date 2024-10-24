@@ -1,4 +1,10 @@
 #!/bin/bash
+# Redirect all output to a file
+# Save the original stdout and stderr
+exec 3>&1 4>&2
+
+exec >installK3s.log
+exec 2>&1
 
 # Check if resourceGroup parameter is provided
 if [ -z "$1" ]; then
@@ -129,5 +135,8 @@ az storage account create --name $sa --resource-group $resourceGroup --enable-hi
 $schemaName=schema${randomstr}
 $namespace="Ignite"
 az iot ops schema registry create --name $schemaName --resource-group $resourceGroup --registry-namespace $namespace --sa-resource-id $(az storage account show --name $sa --resource-group $resourceGroup -o tsv --query id)
+
+
+exec 1>&3 2>&4 # Further commands will now output to the original stdout and stderr and not the log file
 
 exit 0
