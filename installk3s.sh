@@ -46,7 +46,7 @@ sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { lo
 
 sudo mkdir ~/.kube
 kubectl config view --raw=true --flatten=true > ~/.kube/config
-export KUBECONFIG=~/.kube/config
+KUBECONFIG=~/.kube/config
 
 # Prep cluster for AIO
 echo fs.inotify.max_user_instances=8192 | sudo tee -a /etc/sysctl.conf
@@ -63,8 +63,28 @@ az login --identity
 # Get the VM name from the Azure Instance Metadata Service
 vm_name=$(curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/name?api-version=2021-02-01&format=text")
 clusterName="Arc-K3s"
+
 # Arc enable cluster using managed identity
-az connectedk8s connect --name $clusterName --resource-group $resourceGroup --enable-oidc-issuer --enable-workload-identity
+max_retries=5
+retry_count=0
+success=false
+
+while [ $retry_count -lt $max_retries ]; do
+    az connectedk8s connect --name $clusterName --resource-group $resourceGroup --kube-config $KUBECONFIG --enable-oidc-issuer --enable-workload-identity
+    if [ $? -eq 0 ]; then
+        success=true
+        break
+    else
+        echo "Failed to onboard cluster to Azure Arc. Retrying (Attempt $((retry_count+1)))..."
+        retry_count=$((retry_count+1))
+        sleep 10
+    fi
+done
+
+if [ "$success" = false ]; then
+    echo "Error: Failed to onboard the cluster to Azure Arc after $max_retries attempts."
+    exit 1
+fi
 
 oidcIssuerUri=$(az connectedk8s show --resource-group $resourceGroup --name $clusterName --query oidcIssuerProfile.issuerUrl --output tsv)
 configFile="/etc/rancher/k3s/config.yaml"
