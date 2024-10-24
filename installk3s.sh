@@ -31,8 +31,8 @@ fi
 # Renaming default context to k3s cluster name
 context=edge-k3s
 sudo kubectl config rename-context default $context --kubeconfig /etc/rancher/k3s/k3s.yaml
-sudo mkdir ~/.kube
-sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+sudo mkdir $HOME/.kube
+sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
 
 # Installing Helm 3
 echo ""
@@ -50,9 +50,6 @@ echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
 sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
 
-sudo mkdir ~/.kube
-kubectl config view --raw=true --flatten=true > ~/.kube/config
-KUBECONFIG=~/.kube/config
 
 # Prep cluster for AIO
 echo fs.inotify.max_user_instances=8192 | sudo tee -a /etc/sysctl.conf
