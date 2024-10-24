@@ -120,7 +120,7 @@ systemctl restart k3s
 
 # Prep AIO deploy
 randomstr=$(head /dev/urandom | tr -dc a-z0-9 | head -c 8)
-$vault=kv-${randomstr}
+$vault=kv${randomstr}
 az keyvault create --enable-rbac-authorization --name $kv --resource-group $resourceGroup
 
 sa=ig24prel18${randomstr}
