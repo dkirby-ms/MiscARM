@@ -45,7 +45,8 @@ var subnetAddressPrefixCloud = '10.16.64.0/21'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
 var diskSize = 512
-var numberOfIPAddresses =  15 // The number of IP addresses to create
+var publicIpAddressName = '${vmName}-PIP'
+var numberOfIPAddresses =  10 // The number of IP addresses to create
 var cloudK3sSubnet = [
   {
     name: subnetNameCloudK3s
@@ -73,6 +74,19 @@ var cloudSubnet = [
   }
 ]
 
+resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [for i in range(1, numberOfIPAddresses): {
+  name: '${publicIpAddressName}${i}'
+  location: azureLocation
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: 'Basic'
+  }
+}]
+
 // Create multiple NIC IP configurations and assign the public IP to the IP configuration
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   name: networkInterfaceName
@@ -85,6 +99,9 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
           id: cloudVirtualNetwork.properties.subnets[0].id
         }
         privateIPAllocationMethod: 'Dynamic'
+        publicIPAddress: {
+          id: publicIpAddresses[i-1].id
+        }
         primary: i == 1 ? true : false
       }
     }]
