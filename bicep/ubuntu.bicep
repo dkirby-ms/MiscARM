@@ -170,7 +170,6 @@ resource vmRoleAssignment_Storage 'Microsoft.Authorization/roleAssignments@2022-
 resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
   name: virtualNetworkNameCloud
   location: location
-  tags: resourceTags
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -184,7 +183,6 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
 resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023-02-01' = {
   name: networkSecurityGroupNameCloud
   location: location
-  tags: resourceTags
   properties: {
     securityRules: []
   }
