@@ -1,8 +1,8 @@
 @description('The name of you Virtual Machine')
-param vmName string = 'Ag-K3s-${namingGuid}'
+param vmName string = 'K3s-${namingGuid}'
 
 @description('Username for the Virtual Machine')
-param adminUsername string = 'agora'
+param adminUsername string = 'ignite'
 
 @description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
 @secure()
@@ -36,13 +36,8 @@ param subnetNameCloud string = 'subnet-cloud'
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
 
-@description('Resource tag for Jumpstart Agora')
-param resourceTags object = {
-  Project: 'Jumpstart_Agora'
-}
-
 @description('Name of the prod Network Security Group')
-param networkSecurityGroupNameCloud string = 'Ag-NSG-Prod'
+param networkSecurityGroupNameCloud string = 'nsg-Prod'
 
 var addressPrefixCloud = '10.16.0.0/16'
 var subnetAddressPrefixK3s = '10.16.80.0/21'
