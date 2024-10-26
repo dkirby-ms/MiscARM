@@ -6,7 +6,7 @@ param adminUsername string = 'agora'
 
 @description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
 @secure()
-param sshRSAPublicKey string = ''
+param sshRSAPublicKey string = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEDSGpc6dYAmurlE8eUOX0ZaZf9bUDnahX8X2qreYXMcGyVoodMLoqQEjyL/bMlAKzVPJYk2gGMLUT7nz55uPqo63xTu4Ix5dNg8JXSCySrJpoTDpSdb2fzH2XuROjuoTXuOC4Q2YMnB5pxH/M1+MXyqOhkmouMkNTlWbwFZjHBo0dXEdEC9tp5pKn74kVwWfZuS4+Jw/JUwX7rpZSwCtKiMI22BpKLT9oirhQIRUFLwboYC2jdo7b+pUbdZQOoQQ82hHbnxEd1bcnHoczxO0j6NeZ6rA9BzsCpbK7ujFrAXRya1XJmuLlf9kug+pdMKSLOrSnpfjx5eg2C/sL8hBydpilK+6M5cJx63trHzz/kySxW1I2C8GERjCKXqLNIR/W2L5+7yl7BP8Sz1A1FmGFz8BpXULsYStiWZM1FEuBTxoHaNWDvUHAy0SpLPKUSo1oLxsP2hX/z2X88d/webIKHn4EWJFRWBpr8HjJu26qmLcxhywjSMkJSVMXr6G2Rtql7z5TWHgSGijgGBJGm30ehKHAETYArw6OByhpL7zXv5/vOX+u98KFvt6wwVqKni89FHRywn25Ym8wQeHfzR/Yjd1+eP1IqMI8essgFWYmy26Nae5Z1ovYDNbxYezWD9shAg1We4XHWx91S7GCF7Ml1KlDhojle4lz1xL2kJQVbQ== dakir@microsoft.com'
 
 @description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version')
 @allowed([
@@ -25,13 +25,13 @@ param vmSize string = 'Standard_B4ms'
 param namingGuid string = toLower(substring(newGuid(), 0, 5))
 
 @description('Name of the Cloud VNet')
-param virtualNetworkNameCloud string
+param virtualNetworkNameCloud string = 'vnet1'
 
 @description('Name of the K3s subnet in the cloud virtual network')
-param subnetNameCloudK3s string
+param subnetNameCloudK3s string = 'subnet-k3s'
 
 @description('Name of the inner-loop subnet in the cloud virtual network')
-param subnetNameCloud string
+param subnetNameCloud string = 'subnet-cloud'
 
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
