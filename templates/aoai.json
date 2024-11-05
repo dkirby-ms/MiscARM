@@ -1,0 +1,106 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+      "_generator": {
+        "name": "bicep",
+        "version": "0.30.23.60470",
+        "templateHash": "9592755691249433602"
+      }
+    },
+    "parameters": {
+      "openAIAccountName": {
+        "type": "string",
+        "defaultValue": "[format('openai{0}', uniqueString(resourceGroup().id, parameters('location')))]",
+        "metadata": {
+          "description": "The name of the OpenAI Cognitive Services account"
+        }
+      },
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]",
+        "metadata": {
+          "description": "The location of the OpenAI Cognitive Services account"
+        }
+      },
+      "openAISkuName": {
+        "type": "string",
+        "defaultValue": "S0",
+        "metadata": {
+          "description": "The name of the OpenAI Cognitive Services SKU"
+        }
+      },
+      "cognitiveSvcType": {
+        "type": "string",
+        "defaultValue": "AIServices",
+        "metadata": {
+          "description": "The type of Cognitive Services account to create"
+        }
+      },
+      "azureOpenAIModels": {
+        "type": "array",
+        "defaultValue": [
+          {
+            "name": "gpt-4o-mini",
+            "version": "2024-07-18"
+          }
+        ],
+        "metadata": {
+          "description": "The array of OpenAI models to deploy"
+        }
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.CognitiveServices/accounts",
+        "apiVersion": "2024-06-01-preview",
+        "name": "[parameters('openAIAccountName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "[parameters('openAISkuName')]"
+        },
+        "kind": "[parameters('cognitiveSvcType')]",
+        "properties": {
+          "publicNetworkAccess": "Enabled"
+        }
+      },
+      {
+        "copy": {
+          "name": "openAIModelsDeployment",
+          "count": "[length(parameters('azureOpenAIModels'))]",
+          "mode": "serial",
+          "batchSize": 1
+        },
+        "type": "Microsoft.CognitiveServices/accounts/deployments",
+        "apiVersion": "2024-06-01-preview",
+        "name": "[format('{0}/{1}', parameters('openAIAccountName'), format('{0}-{1}-deployment', parameters('openAIAccountName'), parameters('azureOpenAIModels')[copyIndex()].name))]",
+        "sku": {
+          "name": "Standard",
+          "capacity": 50
+        },
+        "properties": {
+          "model": {
+            "format": "OpenAI",
+            "name": "[parameters('azureOpenAIModels')[copyIndex()].name]",
+            "version": "[parameters('azureOpenAIModels')[copyIndex()].version]"
+          },
+          "versionUpgradeOption": "NoAutoUpgrade",
+          "currentCapacity": 50,
+          "raiPolicyName": "Microsoft.Default"
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.CognitiveServices/accounts', parameters('openAIAccountName'))]"
+        ]
+      }
+    ],
+    "outputs": {
+      "openAIEndpoint": {
+        "type": "string",
+        "value": "[filter(items(reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('openAIAccountName')), '2024-06-01-preview').endpoints), lambda('endpoint', equals(lambdaVariables('endpoint').key, 'OpenAI Language Model Instance API')))[0].value]"
+      },
+      "speechToTextEndpoint": {
+        "type": "string",
+        "value": "[filter(items(reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('openAIAccountName')), '2024-06-01-preview').endpoints), lambda('endpoint', equals(lambdaVariables('endpoint').key, 'Speech Services Speech to Text')))[0].value]"
+      }
+    }
+  }
