@@ -25,7 +25,7 @@
       },
       "openAISkuName": {
         "type": "string",
-        "defaultValue": "S0",
+        "defaultValue": "S1",
         "metadata": {
           "description": "The name of the OpenAI Cognitive Services SKU"
         }
